@@ -78,3 +78,24 @@ void thpool_resume(Thpool *tpool);
 void thpool_destroy(Thpool *tpool);
 u64 thpool_working_threads(Thpool *tpool);
 u64 thpool_free_threads(Thpool *tpool);
+```
+
+## Bibliography & References
+
+This project was developed with inspiration and technical guidance from the following resources:
+
+### Articles & Tutorials
+* **[Thread Pool in C](https://nachtimwald.com/2019/04/12/thread-pool-in-c/)** by John Schember (Nachtimwald, 2019).  
+  A comprehensive guide on building a task-based thread pool from scratch using POSIX threads.
+* **[Creating a Thread Pool in C](https://markc.su/posts/threadpool_c)** by Mark Christian (2022).  
+  A detailed walkthrough of implementing a thread pool to solve performance bottlenecks in network-heavy applications.
+
+### Open Source Implementations
+* **[Pithikos/C-Thread-Pool](https://github.com/Pithikos/C-Thread-Pool)** by Manos Pithikos.  
+  A minimal but advanced ANSI C thread pool implementation that is well-tested and widely used in the community.
+* **[neo2043/cthreadpool](https://github.com/neo2043/cthreadpool)** by neo2043.  
+  A cross-platform pthread-based thread pool library focused on simple job queue management.
+
+### Educational Videos
+* **[Why thread pools even exist? and how to implement them?](https://www.youtube.com/watch?v=NgYS6mIUYmA)** by Arpit Bhayani (2024).  
+  An excellent video explanation of the fundamental "why" behind thread pools and the mechanics of a blocking task queue.
