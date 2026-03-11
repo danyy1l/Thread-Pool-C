@@ -52,7 +52,7 @@ int main(void) {
     
     return 0;
 }
-``
+```
 
 ## Public API Reference
 
