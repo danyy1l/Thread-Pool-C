@@ -40,9 +40,9 @@ struct _Thpool {
   pthread_mutex_t lock;     // Lock
   pthread_cond_t work_cond; // Work Condition variable
   pthread_cond_t wait_cond; // Wait Condition variable
-  u64 done;                 // Boolean for job end indication
-  u64 pause;                // Boolean for work pause indication
-}; // 208 total bytes, aligned to multiple of 8 --> 0 padding bytes
+  u32 done;                 // Boolean for job end indication
+  u32 pause;                // Boolean for work pause indication
+}; // 200 total bytes, aligned to multiple of 8 --> 0 padding bytes
 
 /*********************** FUNCTION DECLARATIONS ***************************/
 
