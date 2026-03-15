@@ -3,10 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef DEBUG
-#define DEBUG 1
-#endif
-
 #if defined(DEBUG)
 /**
  * @brief Imprimir error y terminar el programa
@@ -19,7 +15,7 @@
     exit(EXIT_FAILURE);                                                        \
   } while (0)
 #else
-#define die(msg)
+#define die(msg) ((void)0)
 #endif
 
 typedef void (*thread_task_t)(void *arg);
@@ -67,7 +63,7 @@ static void *worker_thread(void *arg);
 static i32 taskqueue_init(taskqueue *tq, u64 capacity) {
   tq->front = 0;
   tq->rear = 0;
-  tq->capacity = capacity;
+  tq->capacity = capacity + 1;
 
   tq->task_list = (task *)malloc(sizeof(task) * tq->capacity);
   if (tq->task_list == NULL)
@@ -140,7 +136,8 @@ Thpool *thpool_init(u64 n_threads, u64 queue_capacity) {
   ptr->done = 0;
   ptr->pause = 0;
 
-  /* Initialzie task queue */
+  /* Initialzie task queue, ring buffer sacrifices one position so we malloc 1
+   * more space*/
   if (taskqueue_init(&(ptr->task_queue), queue_capacity) == ERR) {
     free(ptr->workers);
     free(ptr);
@@ -154,7 +151,11 @@ Thpool *thpool_init(u64 n_threads, u64 queue_capacity) {
 
   /* Initialize all threads (create and detach) */
   for (u64 i = 0; i < n_threads; i++) {
-    pthread_create(&(ptr->workers[i]), NULL, worker_thread, ptr);
+    if (pthread_create(&(ptr->workers[i]), NULL, worker_thread, ptr) != 0) {
+      free(ptr->workers);
+      free(ptr);
+      die("thpool_init(): Couldn't create threads");
+    }
   }
 
   return ptr;
@@ -210,6 +211,12 @@ static void *worker_thread(void *arg) {
 i32 thpool_add_task(Thpool *tpool, void (*p_func_t)(void *arg), void *arg) {
   /* Lock before any interaction with task queue */
   pthread_mutex_lock(&(tpool->lock));
+
+  if (tpool->done == 1) {
+    pthread_mutex_unlock(&(tpool->lock));
+    die("thpool_add_task(): pool is shutting down");
+    return ERR;
+  }
 
   if (taskqueue_is_full(&(tpool->task_queue))) {
     pthread_mutex_unlock(&(tpool->lock));
